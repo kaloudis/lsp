@@ -49,7 +49,7 @@ The client SHOULD call `lsps7.get_extendable_channels` first.
             "142b3ef8-2eca-6135-7f74-7d1afda8b835",
             "39afg2a3-7cf7-f3b6-056e-43f0d5b61f3f"
         ],
-        "funding_outpoint": "a635c7ed7944ddbc8e08293144c2d9f4f58dc7cabb416c9d1e74abe71fe21791:1",
+        "short_channel_id": "871428x964x0",
         "max_channel_extension_expiry_blocks": 300,
         "expiration_block": 839230
     }
@@ -61,7 +61,7 @@ The client SHOULD call `lsps7.get_extendable_channels` first.
 
 - `original_order <object>` The original order for the channel lease, including the `id <string>` to identify the order and the `service <string>` the purchase occured on.
 - `extension_order_ids <string[]>` A list of order ids for each time the channel lease has been extended.
-- `funding_outpoint <string>` The channel point (<txid>:<output_index>) to identify the channel in question.
+- `short_channel_id` <[LSPS0.scid][]> Short Channel Identifier (SCID) of the channel.
 - `max_channel_extension_expiry_blocks <uint32>` The maximum number of blocks a channel can be leased for.
 - `expiration_block <uint32>` The block height at which the channel lease will expiry.
   - MUST be 1 or greater.
@@ -86,14 +86,14 @@ The request is constructed depending on the client's needs.
 
 ```json
 {
-  "funding_outpoint":  "a635c7ed7944ddbc8e08293144c2d9f4f58dc7cabb416c9d1e74abe71fe21791:1",
+  "short_channel_id": "871428x964x0",
   "channel_extension_expiry_blocks": 144,
   "token": "",
   "refund_onchain_address": "bc1qvmsy0f3yyes6z9jvddk8xqwznndmdwapvrc0xrmhd3vqj5rhdrrq6hz49h"
 }
 ```
 
-- `funding_outpoint <string>` The channel point (<txid>:<output_index>) of the channel to extend.
+- `short_channel_id` <[LSPS0.scid][]> Short Channel Identifier (SCID) of the channel to extend.
 - `channel_extension_expiry_blocks <uint32>` How long to extend the lease of the channel in block time.
   - MUST be 1 or greater. 
   - MUST be below or equal to `max_channel_extension_expiry_blocks` returned from the `get_extendable_channels` call.
@@ -107,7 +107,7 @@ The request is constructed depending on the client's needs.
 ```json
 {
   "order_id": "bb4b5d0a-8334-49d8-9463-90a6d413af7c",
-  "funding_outpoint":  "a635c7ed7944ddbc8e08293144c2d9f4f58dc7cabb416c9d1e74abe71fe21791:1",
+  "short_channel_id": "871428x964x0",
   "channel_extension_expiry_blocks": 144,
   "new_channel_expiry_blocks": 839374,
   "token": "",
@@ -133,9 +133,9 @@ The request is constructed depending on the client's needs.
     }
   },
   "channel": {
+    "short_channel_id": "871428x964x0",
     "expires_at": "2024-08-19T19:43:20.529Z",
     "funded_at": "2024-05-21T19:43:20.529Z",
-    "funding_outpoint": "a635c7ed7944ddbc8e08293144c2d9f4f58dc7cabb416c9d1e74abe71fe21791:1"
   },
 }
 ```
@@ -144,7 +144,7 @@ The request is constructed depending on the client's needs.
   - MUST be unique.
   - MUST be at most 64 characters long.
   - SHOULD be a valid [UUID version 4](https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_(random)) (aka random UUID).
-- `funding_outpoint <string>` Mirrored from the request.
+- `short_channel_id` <[LSPS0.scid][]> Mirrored from the request.
 - `funding_confirms_within_blocks <uint16>` Mirrored from the request.
 - `token <string>` Mirrored from the request.
   - MUST be an empty string if the token was not provided.
@@ -371,21 +371,19 @@ and/or the LSP disabled onchain payments.
 
 ### 4. Channel
 
-The `channel` object mirrors the formatting of the `channel` object in [LSPS1][].
-
 **Channel object**
 
 ```json
 {
+  "short_channel_id": "871428x964x0",
   "funded_at": "2012-04-23T18:25:43.511Z",
-  "funding_outpoint": "0301e0480b374b32851a9462db29dc19fe830a7f7d7a88b81612b9d42099c0ae:0",
   "expires_at": "2012-04-23T18:25:43.511Z"
 }
 ```
 
 - `channel <object>` Contains channel information. 
+  - `short_channel_id` <[LSPS0.scid][]> Short Channel Identifier (SCID) of the channel.
   - `funded_at` <[LSPS0.datetime][]> Datetime when the funding transaction has been published.
-  - `funding_outpoint` <[LSPS0.outpoint][]> Outpoint of the [funding transaction](https://github.com/lightning/bolts/blob/master/03-transactions.md#funding-transaction-output).
   - `expires_at` <[LSPS0.datetime][]> Earliest datetime when the channel MAY be closed by the LSP.
     - MUST respect `channel_expiry_blocks`. 
     - MAY overprovision.
