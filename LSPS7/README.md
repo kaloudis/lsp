@@ -59,12 +59,12 @@ The client SHOULD call `lsps7.get_extendable_channels` first.
 
 `extendable_channels` is an array of channels the LSP will allow you to extend the expiry of. These channels have the following properties:
 
-- `original_order <object>` The original order for the channel lease, including the `id <string>` to identify the order and the `service <string>` the purchase occured on.
-- `extension_order_ids <string[]>` A list of order ids for each time the channel lease has been extended.
+- `original_order <object>` An *optional* property for the original order for the channel lease, including the `id <string>` to identify the order and the `service <string>` the purchase occured on.
+- `extension_order_ids <string[]>` An *optional* list of order IDs for each time the channel lease has been extended.
 - `short_channel_id` <[LSPS0.scid][]> Short Channel Identifier (SCID) of the channel.
 - `max_channel_extension_expiry_blocks <uint32>` The maximum number of blocks a channel can be leased for.
-- `expiration_block <uint32>` The block height at which the channel lease will expiry.
-  - MUST be 1 or greater.
+- `expiration_block <uint32>` The block height at which the channel lease will expiry. May be marked as 0 if the user opened the channel to the LSP, and the LSP has no obligation to keep open.
+  - MUST be 0 or greater.
 
 > **Rationale `original_order`** The client MAY want to look up the original order for reference.
 
