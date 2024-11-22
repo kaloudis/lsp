@@ -57,18 +57,7 @@ The client SHOULD call `lsps7.get_extendable_channels` first.
 }
 ```
 
-`extendable_channels` is an array of channels the LSP will allow you to extend the expiry of. These channels have the following properties:
-
-- `original_order <object>` An *optional* property for the original order for the channel lease, including the `id <string>` to identify the order and the `service <string>` the purchase occured on.
-- `extension_order_ids <string[]>` An *optional* list of order IDs for each time the channel lease has been extended.
-- `short_channel_id` <[LSPS0.scid][]> Short Channel Identifier (SCID) of the channel.
-- `max_channel_extension_expiry_blocks <uint32>` The maximum number of blocks a channel can be leased for.
-- `expiration_block <uint32>` The block height at which the channel lease will expiry. May be marked as 0 if the user opened the channel to the LSP, and the LSP has no obligation to keep open.
-  - MUST be 0 or greater.
-
-> **Rationale `original_order`** The client MAY want to look up the original order for reference.
-
-> **Rationale `extension_order_ids`** The client MAY want to look up any one of the previous extensions orders for reference.
+`extendable_channels` is an array of channels the LSP will allow you to extend the expiry of. The structure of the `extendable_channel` object can be found in section [3. Extendable Channel](#3-extendable-channel).
 
 
 **Errors** No additional errors are defined for this method.
@@ -107,7 +96,6 @@ The request is constructed depending on the client's needs.
 ```json
 {
   "order_id": "bb4b5d0a-8334-49d8-9463-90a6d413af7c",
-  "short_channel_id": "871428x964x0",
   "channel_extension_expiry_blocks": 144,
   "new_channel_expiry_blocks": 839374,
   "token": "",
@@ -133,9 +121,17 @@ The request is constructed depending on the client's needs.
     }
   },
   "channel": {
+    "original_order": {
+      "id": "3c2ef2b-195f-0695-b72ef-3929b9138e04",
+      "service": "LSPS1"
+    },
+    "extension_order_ids": [
+      "142b3ef8-2eca-6135-7f74-7d1afda8b835",
+      "39afg2a3-7cf7-f3b6-056e-43f0d5b61f3f"
+    ],
     "short_channel_id": "871428x964x0",
-    "expires_at": "2024-08-19T19:43:20.529Z",
-    "funded_at": "2024-05-21T19:43:20.529Z",
+    "max_channel_extension_expiry_blocks": 300,
+    "expiration_block": 839230
   },
 }
 ```
@@ -144,7 +140,6 @@ The request is constructed depending on the client's needs.
   - MUST be unique.
   - MUST be at most 64 characters long.
   - SHOULD be a valid [UUID version 4](https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_(random)) (aka random UUID).
-- `short_channel_id` <[LSPS0.scid][]> Mirrored from the request.
 - `funding_confirms_within_blocks <uint16>` Mirrored from the request.
 - `token <string>` Mirrored from the request.
   - MUST be an empty string if the token was not provided.
@@ -153,8 +148,8 @@ The request is constructed depending on the client's needs.
   - `CREATED` Order has been created. Default value.
   - `COMPLETED` LSP has published funding transaction.
   - `FAILED` Order failed.
-- `payment <object>` Contains everything about payments, see [3. Payment](#3-payment).
-- `channel <object>` Contains information about the channel, see [4 Channel](#4-channel).
+- `payment <object>` Contains everything about payments, see [4. Payment](#4-payment).
+- `channel <object>` Contains information about the channel, see [3. Extendable Channel](#3-extendable-channel).
 
 
 **Client**
@@ -211,7 +206,22 @@ The client MAY check the current status of the order at any point.
 | 101    | Not found | {}      | Order with the requested order_id has not been found. |
 
 
-### 3. Payment
+### 3. Extendable channel
+
+The `extendable_channel` object returned in `lsps7.get_extendable_channels`, `lsps7.create_order`, and `lsps7.get_order`, has the following properties:
+
+- `original_order <object>` An *optional* property for the original order for the channel lease, including the `id <string>` to identify the order and the `service <string>` the purchase occured on.
+- `extension_order_ids <string[]>` An *optional* list of order IDs for each time the channel lease has been extended.
+- `short_channel_id` <[LSPS0.scid][]> Short Channel Identifier (SCID) of the channel.
+- `max_channel_extension_expiry_blocks <uint32>` The maximum number of blocks a channel can be leased for.
+- `expiration_block <uint32>` The block height at which the channel lease will expiry. May be marked as 0 if the user opened the channel to the LSP, and the LSP has no obligation to keep open.
+  - MUST be 0 or greater.
+
+> **Rationale `original_order`** The client MAY want to look up the original order for reference.
+
+> **Rationale `extension_order_ids`** The client MAY want to look up any one of the previous extensions orders for reference.
+
+### 4. Payment
 
 The `payment` object returned by `lsps7.create_order` and `lsps7.get_order`, mirrors the formatting of [LSPS1.payment][].
 
